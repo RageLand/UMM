@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/estilotabla.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="listardatos.html">Listar Datos</a></li>
+            <li><a href="imagenes.html">Imagenes</a></li>
+        </ul>
+    </nav>
+    <h2>Helados</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Sabor</th>
+                <th>Tipo</th>
+                <th>Cobertura</th>
+                <th>Precio</th>
+                <th>Acciones</th> <!-- Nueva columna para las acciones -->
+            </tr>
+        </thead>
+        <tbody id="helados-list"></tbody>
+    </table>
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Detalles del Helado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modal-content"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar este usuario?</p>
+                    <input type="hidden" id="eliminar-id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmar-eliminar-btn">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar los helados al cargar la página
+        window.onload = function () {
+            // Realizar una solicitud GET a la ruta /helados
+            fetch('/helados')
+            // Procesar la respuesta como JSON
+            .then(function(response) {
+                return response.json();
+            })
+            // Cuando se obtienen los datos JSON
+            .then(function(data) {
+                // Obtener una referencia al elemento HTML con el ID 'helados-list'
+                var heladosList = document.getElementById('helados-list');
+                // Iterar sobre cada helado en los datos recibidos
+                data.forEach(function(helado) {
+                    // Crear una nueva fila de tabla
+                    var row = document.createElement('tr');
+                    // Establecer el contenido HTML de la fila con los datos del helado
+                    row.innerHTML = '<td>' + helado.nombre + '</td>' +
+                                    '<td>' + helado.descripcion + '</td>' +
+                                    '<td>' + helado.sabor + '</td>' +
+                                    '<td>' + helado.tipo + '</td>' +
+                                    '<td>' + helado.cobertura + '</td>' +
+                                    '<td>' + helado.precio + '</td>' +
+                                    '<td>' +
+                                        '<button onclick="mostrarModalEliminar(' + helado.id + ')">Eliminar</button>' +
+                                        '<button onclick="detalleHelado(' + helado.id + ')">Ver Detalle</button>' +
+                                    '</td>';
+                    // Agregar la fila a la lista de helados
+                    heladosList.appendChild(row);
+                });
+            });
+        };
+
+
+
+        function detalleHelado(id) {
+            fetch('/helados/' + id)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(helados) {
+                var modalContent = document.getElementById('modal-content');
+                modalContent.innerHTML = '<p>ID: ' + helados.id + '</p>' +
+                                         '<p>Nombre: ' + helados.nombre + '</p>' +
+                                         '<p>Descripcion: ' + helados.descripcion + '</p>' +
+                                         '<p>Sabor: ' + helados.sabor + '</p>' +
+                                         '<p>Tipo: ' + helados.tipo + '</p>' +
+                                         '<p>Cobertura: ' + helados.cobertura + '</p>' +
+                                         '<p>Precio: ' + helados.precio + '</p>' 
+                var userModal = new bootstrap.Modal(document.getElementById('userModal'));
+                userModal.show();
+            });
+        }
+
+
+
+
+        function mostrarModalEliminar(id) {
+            document.getElementById('eliminar-id').value = id;
+            var eliminarModal = new bootstrap.Modal(document.getElementById('eliminarModal'));
+            eliminarModal.show();
+        }
+
+        document.getElementById('confirmar-eliminar-btn').addEventListener('click', function() {
+            var id = document.getElementById('eliminar-id').value;
+            fetch('/eliminar_helado/' + id, {
+                method: 'DELETE'
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    console.log('Helado eliminado correctamente.');
+                    window.location.reload();
+                } else {
+                    console.error('Error al eliminar usuario.');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error en la solicitud:', error);
+            });
+        });
+    </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> <!-- Incluye Bootstrap JS -->
+
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/estiloInicio.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="listardatos.html">Listar Datos</a></li>
+            <li><a href="imagenes.html">Imagenes</a></li>
+            <li><a href="registro.html">registro</a></li>
+            
+        </ul>
+    </nav>
+    
+ 
+    <h1>Formulario de Acceso</h1>
+    <form action="/iniciar_sesion" method="post">
+        <label for="correo">Correo Electronico:</label>
+        <input type="email" id="corre" name="correo" required>
+        <br><br>
+        <label for="contraseña">Contraseña:</label>
+        <input type="password" id="contraseña" name="contraseña" required>
+        <br><br>
+ 
+        <input type="submit" value="Iniciar Sesion">
+    </form>
+ 
+</body>
+</html>
